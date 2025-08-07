@@ -2,6 +2,9 @@
 
 KAleep-Net: A Kolmogorov-Arnold Flash Attention Network for Sleep Stage Classification Using Single-Channel EEG with Explainability
 
+![Graphic Abstract](./images/grpahic_abstruct.png)
+
+
 ## Requirements
 
 - See `requirements.txt` for dependencies.
