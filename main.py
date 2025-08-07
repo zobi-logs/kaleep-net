@@ -73,25 +73,58 @@ class KAleepNet(nn.Module):
         return logits
 
 #LOAD DATA 
-npz_folder = './data'
-npz_files = sorted(glob.glob(os.path.join(npz_folder, "*.npz")))
-X = np.zeros((0, 3000, 1))
-y = []
-for fn in npz_files:
-    dat = np.load(fn)
-    X = np.concatenate((X, dat['x'][:, :3000, :]), axis=0)
-    y.extend(dat['y'])
-X = np.array(X)
-y = np.array(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, random_state=42)
+
+
+npz_folder = './data'
+npz_files  = sorted(glob.glob(os.path.join(npz_folder, "*.npz")))
+
+X_list, y_list, subject_list = [], [], []
+for subj_idx, fn in enumerate(npz_files):
+    dat = np.load(fn)
+    x   = dat['x'][:, :3000, :]      # (n_samples,3000,1)
+    y   = dat['y']                   # (n_samples,)
+    n   = x.shape[0]
+
+    X_list.append(x)
+    y_list.append(y)
+    subject_list.extend([subj_idx]*n)
+
+# final arrays
+X        = np.concatenate(X_list, axis=0)
+y        = np.concatenate(y_list, axis=0)
+subjects = np.array(subject_list)
+
+
+from sklearn.model_selection import GroupShuffleSplit
+
+
+gss = GroupShuffleSplit(n_splits=1, test_size=0.10, random_state=42)
+trainval_idx, test_idx = next(gss.split(X, y, groups=subjects))
+
+X_trainval, y_trainval, grp_trainval = X[trainval_idx], y[trainval_idx], subjects[trainval_idx]
+X_test,     y_test     = X[test_idx],     y[test_idx]
+
+
+gss_val = GroupShuffleSplit(n_splits=1, test_size=0.111, random_state=42)
+train_idx, val_idx = next(gss_val.split(X_trainval, y_trainval, groups=grp_trainval))
+
+X_train, y_train = X_trainval[train_idx], y_trainval[train_idx]
+X_val,   y_val   = X_trainval[val_idx],   y_trainval[val_idx]
+
+
+assert set(subjects[train_idx]) & set(subjects[val_idx]) == set()
+assert set(subjects[train_idx]) & set(subjects[test_idx]) == set()
+assert set(subjects[val_idx])   & set(subjects[test_idx]) == set()
+
+
 train_ds = EEGDataset(X_train, y_train)
-val_ds = EEGDataset(X_val, y_val)
-test_ds = EEGDataset(X_test, y_test)
+val_ds   = EEGDataset(X_val,   y_val)
+test_ds  = EEGDataset(X_test,  y_test)
+
 train_loader = DataLoader(train_ds, batch_size=64, shuffle=True)
-val_loader = DataLoader(val_ds, batch_size=64)
-test_loader = DataLoader(test_ds, batch_size=64)
+val_loader   = DataLoader(val_ds,   batch_size=64)
+test_loader  = DataLoader(test_ds,  batch_size=64)
 
 #  CHECKPOINTING & LR SCHEDULING 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
