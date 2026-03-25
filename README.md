@@ -9,7 +9,7 @@
 
 ## Important Notice — Code Version History
 
-This repository contains **v2.0** of the released code, which supersedes an earlier version that was shared informally prior to publication. If you received or cloned code before **[March 2026]**, please discard it and use only this version.
+This repository contains **v2.0** of the released code, which supersedes an earlier version that was shared informally prior to publication. If you received or cloned code before **March 2026**, please discard it and use only this version.
 
 **What was wrong in the earlier version:**
 
