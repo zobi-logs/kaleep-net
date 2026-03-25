@@ -9,7 +9,7 @@
 
 ## Important Notice — Code Version History
 
-This repository contains **v2.0** of the released code, which supersedes an earlier version that was shared informally prior to publication. If you received or cloned code before **[insert your release date here]**, please discard it and use only this version.
+This repository contains **v2.0** of the released code, which supersedes an earlier version that was shared informally prior to publication. If you received or cloned code before **[March 2026]**, please discard it and use only this version.
 
 **What was wrong in the earlier version:**
 
@@ -24,7 +24,7 @@ This repository contains **v2.0** of the released code, which supersedes an earl
 | Subject-overlap assertions | Indexed wrong array | Fixed to use per-fold group arrays |
 | Syntax error in `main.py` | Stray `n)` token — crashes immediately | Fixed |
 
-Results reproducible from this version are intended to match those reported in Table V of the paper.
+
 
 ---
 
